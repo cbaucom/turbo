@@ -45,7 +45,7 @@ func (g *CompleteGraph) GetPackageTaskVisitor(ctx gocontext.Context, visitor fun
 		}
 
 		// first check for package-tasks
-		taskDefinition, ok := g.Pipeline[fmt.Sprintf("%v", taskID)]
+		taskDefinition, ok := g.Pipeline[taskID]
 
 		if !ok {
 			// then check for regular tasks
