@@ -44,6 +44,11 @@ func (g *CompleteGraph) GetPackageTaskVisitor(ctx gocontext.Context, visitor fun
 			return fmt.Errorf("cannot find package %v for task %v", packageName, taskID)
 		}
 
+		// TODO: we need to construct a new TaskDefinition object here that
+		// merges any relavant TaskDefinition from the task's workspace (or nearest one)
+		// and then follows any extends to find more configs. Once we have all of them
+		// start with the outermost and merge into it, overwriting as we go.
+
 		// first check for package-tasks
 		taskDefinition, ok := g.Pipeline[taskID]
 
