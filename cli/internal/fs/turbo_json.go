@@ -98,8 +98,6 @@ type TaskDefinition struct {
 	Persistent bool
 }
 
-func LoadOnlyTurboConfig(rootPath turbopath.AbsoluteSystemPath)
-
 // LoadTurboConfig loads, or optionally, synthesizes a TurboJSON instance
 func LoadTurboConfig(rootPath turbopath.AbsoluteSystemPath, rootPackageJSON *PackageJSON, includeSynthesizedFromRootPackageJSON bool) (*TurboJSON, error) {
 	var turboJSON *TurboJSON
@@ -161,7 +159,7 @@ func (to TaskOutputs) Sort() TaskOutputs {
 }
 
 // ReadTurboConfigOnly reads turbo.json from its path
-func ReadTurboConfigOnly(turboJSONPath turbopath.AbsoluteSystemPath) (*TurboJSON, error) {
+func ReadTurboConfiFromPath(turboJSONPath turbopath.AbsoluteSystemPath) (*TurboJSON, error) {
 	// If the configFile exists, use that
 	if turboJSONPath.FileExists() {
 		turboJSON, err := readTurboJSON(turboJSONPath)
