@@ -160,10 +160,8 @@ func (to TaskOutputs) Sort() TaskOutputs {
 	return TaskOutputs{Inclusions: inclusions, Exclusions: exclusions}
 }
 
-// ReadTurboConfigOnly returns turbo.json from a filepath
-func ReadTurboConfigOnly(filepath turbopath.AbsoluteSystemPath) (*TurboJSON, error) {
-	turboJSONPath := filepath.UntypedJoin(configFile)
-
+// ReadTurboConfigOnly reads turbo.json from its path
+func ReadTurboConfigOnly(turboJSONPath turbopath.AbsoluteSystemPath) (*TurboJSON, error) {
 	// If the configFile exists, use that
 	if turboJSONPath.FileExists() {
 		turboJSON, err := readTurboJSON(turboJSONPath)

@@ -57,23 +57,20 @@ func (g *CompleteGraph) GetPackageTaskVisitor(ctx gocontext.Context, visitor fun
 		// Start a list of TaskDefinitions we've found for this TaskID
 		taskDefinitions := []fs.TaskDefinition{}
 
-		// TODO: we need to construct a new TaskDefinition object here that
-		// merges any relavant TaskDefinition from the task's workspace (or nearest one)
-		// and then follows any extends to find more configs. Once we have all of them
-		// start with the outermost and merge into it, overwriting as we go.
-
-		// 1. Find Closest turbo.json
-		//		start in workspace directory
-		//		pkg.Dir is a turbopath.AnchoredSystemPath, convert to AbsoluteSystemPath
+		// Start in the workspace directory
+		// Find the closest turbo.json as we iterate up
+		// TODO: where does this Findup end?
 		directory := turbopath.AbsoluteSystemPath(pkg.Dir)
+		turboJSONPath, findTurboJSONErr := directory.Findup("turbo.json")
+		if findTurboJSONErr != nil {
+			return findTurboJSONErr
+		}
 
-		// For loop until we don't have an extends key anymore.
+		// For loop until we break manually.
+		// We will reassign `turboJSONPath` inside this loop, so that
+		// every time we iterate, we're starting from a new one.
 		for {
-			nearestTurboJSON, findTurboJSONErr := directory.Findup("turbo.json")
-			if findTurboJSONErr != nil {
-				return findTurboJSONErr
-			}
-			turboJSON, err := fs.ReadTurboConfigOnly(nearestTurboJSON)
+			turboJSON, err := fs.ReadTurboConfiFromPath(turboJSONPath)
 			if err != nil {
 				return err
 			}
@@ -102,6 +99,9 @@ func (g *CompleteGraph) GetPackageTaskVisitor(ctx gocontext.Context, visitor fun
 				}
 
 				directory = turbopath.AbsoluteSystemPath(workspace.Dir)
+
+				// Reassign this. The loop will run again with this new turbo.json now.
+				turboJSONPath = directory.UntypedJoin("turbo.json")
 			}
 		}
 
@@ -152,6 +152,8 @@ func getTaskFromPipeline(pipeline fs.Pipeline, taskID string, taskName string) (
 		fallbackTaskDefinition, notcool := pipeline[taskName]
 		// if neither, then bail
 		if !notcool {
+			// TODO: the compiler doesn't like this nil return here, can't
+			// remember how to do an empty return for a struct...
 			return nil, fmt.Errorf("No task defined in pipeline")
 		}
 
